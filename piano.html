@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Piano with Tone Controls</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .piano-container {
+            display: flex;
+            margin-bottom: 30px;
+        }
+        
+        .key {
+            position: relative;
+            width: 60px;
+            height: 200px;
+            border: 1px solid #000;
+            background-color: white;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+            box-sizing: border-box;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.1s;
+        }
+        
+        .key.black {
+            width: 40px;
+            height: 120px;
+            background-color: #333;
+            color: white;
+            margin-left: -20px;
+            margin-right: -20px;
+            z-index: 1;
+        }
+        
+        .key.active {
+            background-color: #4CAF50;
+        }
+        
+        .key.black.active {
+            background-color: #2E7D32;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        label {
+            font-weight: bold;
+            min-width: 120px;
+        }
+        
+        input[type="range"] {
+            flex-grow: 1;
+            margin: 0 15px;
+        }
+        
+        .value-display {
+            min-width: 40px;
+            text-align: right;
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+        
+        .keyboard-map {
+            margin-top: 20px;
+            font-family: monospace;
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            line-height: 1.8;
+        }
+        
+        .key-label {
+            position: absolute;
+            bottom: 5px;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .key.black .key-label {
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <div class="control-group">
+            <label for="volume">Volume:</label>
+            <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5">
+            <span class="value-display" id="volume-value">0.5</span>
+        </div>
+        <div class="control-group">
+            <label for="duration">Note Duration (ms):</label>
+            <input type="range" id="duration" min="100" max="3000" step="50" value="500">
+            <span class="value-display" id="duration-value">500</span>
+        </div>
+        <div class="control-group">
+            <label for="waveform">Waveform:</label>
+            <select id="waveform">
+                <option value="sine">Sine</option>
+                <option value="square">Square</option>
+                <option value="sawtooth">Sawtooth</option>
+                <option value="triangle">Triangle</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="piano-container">
+        <div class="key" data-note="C4" data-key="A">
+            C
+            <div class="key-label">A</div>
+        </div>
+        <div class="key black" data-note="C#4" data-key="W">
+            C#
+            <div class="key-label">W</div>
+        </div>
+        <div class="key" data-note="D4" data-key="S">
+            D
+            <div class="key-label">S</div>
+        </div>
+        <div class="key black" data-note="D#4" data-key="E">
+            D#
+            <div class="key-label">E</div>
+        </div>
+        <div class="key" data-note="E4" data-key="D">
+            E
+            <div class="key-label">D</div>
+        </div>
+        <div class="key" data-note="F4" data-key="F">
+            F
+            <div class="key-label">F</div>
+        </div>
+        <div class="key black" data-note="F#4" data-key="T">
+            F#
+            <div class="key-label">T</div>
+        </div>
+        <div class="key" data-note="G4" data-key="G">
+            G
+            <div class="key-label">G</div>
+        </div>
+        <div class="key black" data-note="G#4" data-key="Y">
+            G#
+            <div class="key-label">Y</div>
+        </div>
+        <div class="key" data-note="A4" data-key="H">
+            A
+            <div class="key-label">H</div>
+        </div>
+        <div class="key black" data-note="A#4" data-key="U">
+            A#
+            <div class="key-label">U</div>
+        </div>
+        <div class="key" data-note="B4" data-key="J">
+            B
+            <div class="key-label">J</div>
+        </div>
+        <div class="key" data-note="C5" data-key="K">
+            C
+            <div class="key-label">K</div>
+        </div>
+    </div>
+    
+    <div class="instructions">
+        <p>Play the piano using your computer keyboard:</p>
+        <div class="keyboard-map">
+            <strong>White keys:</strong> A (C), S (D), D (E), F (F), G (G), H (A), J (B), K (C)<br>
+            <strong>Black keys:</strong> W (C#), E (D#), T (F#), Y (G#), U (A#)
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const keys = document.querySelectorAll('.key');
+            
+            // Create a map of notes to frequencies
+            const noteFrequencies = {
+                'C4': 261.63,
+                'C#4': 277.18,
+                'D4': 293.66,
+                'D#4': 311.13,
+                'E4': 329.63,
+                'F4': 349.23,
+                'F#4': 369.99,
+                'G4': 392.00,
+                'G#4': 415.30,
+                'A4': 440.00,
+                'A#4': 466.16,
+                'B4': 493.88,
+                'C5': 523.25
+            };
+            
+            // Create a map of computer keys to piano notes
+            const keyMap = {};
+            keys.forEach(key => {
+                const note = key.getAttribute('data-note');
+                const computerKey = key.getAttribute('data-key');
+                keyMap[computerKey.toLowerCase()] = note;
+            });
+            
+            // Get control elements
+            const volumeControl = document.getElementById('volume');
+            const durationControl = document.getElementById('duration');
+            const waveformControl = document.getElementById('waveform');
+            const volumeValue = document.getElementById('volume-value');
+            const durationValue = document.getElementById('duration-value');
+            
+            // Update displayed values when controls change
+            volumeControl.addEventListener('input', () => {
+                volumeValue.textContent = volumeControl.value;
+            });
+            
+            durationControl.addEventListener('input', () => {
+                durationValue.textContent = durationControl.value;
+            });
+            
+            // Active oscillators to track for note-off
+            const activeOscillators = {};
+            
+            // Function to play a note
+            function playNote(note) {
+                const frequency = noteFrequencies[note];
+                if (!frequency) return;
+                
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                // Set waveform type
+                oscillator.type = waveformControl.value;
+                oscillator.frequency.value = frequency;
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // Set initial gain
+                gainNode.gain.value = volumeControl.value;
+                
+                // Create a gentle fade-in
+                const now = audioContext.currentTime;
+                gainNode.gain.setValueAtTime(0.001, now);
+                gainNode.gain.exponentialRampToValueAtTime(volumeControl.value, now + 0.03);
+                
+                // Store oscillator for note-off
+                activeOscillators[note] = { oscillator, gainNode };
+                
+                oscillator.start();
+                
+                // Highlight the key
+                const keyElement = document.querySelector(`.key[data-note="${note}"]`);
+                if (keyElement) {
+                    keyElement.classList.add('active');
+                }
+            }
+            
+            // Function to stop a note
+            function stopNote(note) {
+                const noteObj = activeOscillators[note];
+                if (noteObj) {
+                    const now = audioContext.currentTime;
+                    const duration = parseInt(durationControl.value) / 1000;
+                    
+                    // Create a gentle fade-out
+                    noteObj.gainNode.gain.cancelScheduledValues(now);
+                    noteObj.gainNode.gain.setValueAtTime(noteObj.gainNode.gain.value, now);
+                    noteObj.gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                    
+                    // Stop the oscillator after fade-out
+                    noteObj.oscillator.stop(now + 0.5);
+                    
+                    // Remove from active oscillators
+                    delete activeOscillators[note];
+                    
+                    // Remove key highlight
+                    const keyElement = document.querySelector(`.key[data-note="${note}"]`);
+                    if (keyElement) {
+                        keyElement.classList.remove('active');
+                    }
+                }
+            }
+            
+            // Handle keyboard input
+            document.addEventListener('keydown', function(e) {
+                if (Object.keys(keyMap).includes(e.key.toLowerCase())) {
+                    e.preventDefault();
+                    const note = keyMap[e.key.toLowerCase()];
+                    if (note && !activeOscillators[note]) {
+                        playNote(note);
+                    }
+                }
+            });
+            
+            document.addEventListener('keyup', function(e) {
+                if (Object.keys(keyMap).includes(e.key.toLowerCase())) {
+                    e.preventDefault();
+                    const note = keyMap[e.key.toLowerCase()];
+                    if (note) {
+                        stopNote(note);
+                    }
+                }
+            });
+            
+            // Also allow clicking on keys
+            keys.forEach(key => {
+                key.addEventListener('mousedown', function() {
+                    const note = this.getAttribute('data-note');
+                    if (!activeOscillators[note]) {
+                        playNote(note);
+                    }
+                });
+                
+                key.addEventListener('mouseup', function() {
+                    const note = this.getAttribute('data-note');
+                    stopNote(note);
+                });
+                
+                key.addEventListener('mouseleave', function() {
+                    const note = this.getAttribute('data-note');
+                    if (this.classList.contains('active')) {
+                        stopNote(note);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
